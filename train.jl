@@ -1,4 +1,3 @@
-
 MINIBATCH_SZ = 128
 EMBEDDING_SZ = 64
 STRIDE = 128
@@ -9,41 +8,8 @@ h(x) = round(x * 100) / 100
 hm(x) = h(mean(x))
 id = identity
 
-include("dataset.jl")
-
-using Transformers, Flux, Statistics, ProgressMeter, BSON
-
-struct TBlock{T}
-    t :: T
-end
-Flux.@functor TBlock
-(t :: TBlock)(x) = t.t(x, nothing)[1]
-tb(layers_n) = TBlock(Transformer(Transformers.TransformerBlock, layers_n, HEAD_N, EMBEDDING_SZ, HEAD_N, EMBEDDING_SZ * 2))
-
-struct PositionalEncoder
-    d
-end
-Flux.@functor PositionalEncoder
-Flux.params(pe :: PositionalEncoder) = Flux.params(())
-
-function PositionalEncoder(h :: Integer, w :: Integer)
-    d = zeros(Float32, h, w)
-    for i=1:h
-        for j=1:w
-            if j % 2 == 0
-                d[i, j] = sin((i-1)/10_000^(2*(j-1)/w))
-            else
-                d[i, j] = cos((i-1)/10_000^(2*(j-1)/w))
-            end
-        end
-    end
-    PositionalEncoder(d)
-end
-function (pe :: PositionalEncoder)(x)
-   sz = size(pe.d)
-   x .+ reshape(pe.d, (sz..., 1))
-end
-
+include("src/dataset.jl")
+include("src/helpers.jl")
 
 if !(@isdefined base)
     base = Chain(
@@ -62,7 +28,7 @@ if !(@isdefined base)
     steps_taken = []
 end
 
-function train(train_br, train_bc, class_wt_fn, STEPS, p)
+function trainBRC(train_br, train_bc, class_wt_fn, STEPS, p)
     push!(steps_taken, ("BRC", STEPS))
     losses = []
     fn = (Chain(base, restore), Chain(base, classify))
