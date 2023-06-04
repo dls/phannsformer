@@ -1,5 +1,6 @@
 using Transformers, Flux, Statistics, ProgressMeter, BSON
 
+"Simple wrapper to allow use of the attention heads from the Transformers package, disreguarding tokenization, positional encoding, and other features of that package."
 struct TBlock{T}
     t :: T
 end

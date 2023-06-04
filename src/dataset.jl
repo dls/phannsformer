@@ -9,6 +9,7 @@ const AMINO_ACID_TYPE = UInt8
 const CATEGORY_TYPE = UInt8
 const AMINO_ACID_BLANK = 25
 
+"Struct representing a large collection of categorized ORFs, with precomputed indexes for faster minibatches."
 struct PhANNsDataset
     cats_n :: Int64
     cats_lookup :: Array{Int64}
@@ -69,7 +70,6 @@ function as_batch(s)
     return batch
 end
 
-"Convert an ORF into a batch. Returns a matrix with all STRIDE (current $STRIDE) length substrings."
 function apply_labels_to_file(file, fn)
     seqs = sequences_in_file(file)
     apply_label_to_seqs(seqs, fn)
@@ -84,6 +84,12 @@ function apply_label_to_seqs(seqs, fn)
     return res
 end
 
+""" Samples a minibatch.
+Sampling procedure:
+- Pick a category
+- Pick an ORF
+- Pick an offset in that orf iff length(orf) > STRIDE
+"""
 function load_minibatch!(data :: PhANNsDataset, minibatch_x :: Matrix{AMINO_ACID_TYPE}, minibatch_x_mangled :: Matrix{AMINO_ACID_TYPE}, minibatch_x_mangled_p :: Matrix{Float32}, minibatch_y :: Array{AMINO_ACID_TYPE}, p :: Float64)
     @assert size(minibatch_x_mangled, 2) == length(minibatch_y)
     @assert size(minibatch_x, 2) == length(minibatch_y)

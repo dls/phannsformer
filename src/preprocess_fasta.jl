@@ -6,6 +6,7 @@ if haskey(Pkg.installed(), "PyCall")
 
     sio = pyimport("Bio.SeqIO")
 
+    "Similar to tokenization in NLP. Defines our mapping from amino acids to embeddable integers"
     mapping = Dict("M" => 1,
                    "S" => 2,
                    "I" => 3,
@@ -31,6 +32,7 @@ if haskey(Pkg.installed(), "PyCall")
                    "B" => 23,
                    "Z" => 24)
 
+    "Load ORFs from a file, each converted to a UInt8 vector"
     function sequences_in_file(file)
         seqs = [UInt8[]]
 
@@ -45,15 +47,13 @@ if haskey(Pkg.installed(), "PyCall")
         return seqs[2:end]
     end
 
+    "Load training ORFs, each converted to a UInt8 vector"
     function parseem()
         seqs = [UInt8[]]
         cats = UInt8[]
 
         categories = ["major_capsid", "minor_capsid", "baseplate", "major_tail",
                       "minor_tail", "portal", "tail_fiber", "shaft", "collar", "HTJ", "other"]
-
-        # categories = ["HTJ", "baseplate", "collar", "major_capsid", "major_tail",
-        #               "minor_capsid", "minor_tail", "other", "portal", "shaft", "tail_fiber"]
 
         for c in 1:length(categories)
             for n in 1:11
@@ -70,6 +70,7 @@ if haskey(Pkg.installed(), "PyCall")
     end
 end
 
+"Load the dataset from a binary cache, or regenerate and store that cache from raw fasta files"
 function load_cache_or_regen()
     if isfile("phanns_cache.data")
         return Serialization.deserialize("phanns_cache.data")
@@ -80,4 +81,5 @@ function load_cache_or_regen()
     end
 end
 
+"The phanns training dataset"
 phanns_data = load_cache_or_regen()
