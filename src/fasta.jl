@@ -32,18 +32,15 @@ mapping = Dict(
 function byte_mapped_sequences_in_file(file)
     seqs = []
 
-    println(file)
     i = 0
     FastaReader(file) do fr
         for (desc, seq) in fr
-            println(seq)
             mapped = UInt8[]
             for r=seq
                 if haskey(mapping, r)
                     push!(mapped, mapping[r])
                 end
             end
-            println((i += 1))
             push!(seqs, mapped)
         end
     end
