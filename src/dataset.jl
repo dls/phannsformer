@@ -35,7 +35,7 @@ function PhANNsDataset(cats, lens, seqs)
     PhANNsDataset(cats_n, cats_lookup, cats, lens, seqs)
 end
 
-include("preprocess_fasta.jl")
+include("fasta.jl")
 
 # statically allocated minibatch buffers
 minibatch_x = AMINO_ACID_TYPE.(zeros(STRIDE, MINIBATCH_SZ))
@@ -71,7 +71,7 @@ function as_batch(s)
 end
 
 function apply_labels_to_file(file, fn)
-    seqs = sequences_in_file(file)
+    seqs = byte_mapped_sequences_in_file(file)
     apply_label_to_seqs(seqs, fn)
 end
 
