@@ -122,8 +122,8 @@ learning_rate = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, eta_min=mi
 for t in range(epochs):
     train(train_dataloader, model, loss_fn, optimizer)
     learning_rate.step()
-    if t % 10 == 0:
-        test(test_dataloader, model, loss_fn)
+    # if t % 10 == 0:
+    #     test(test_dataloader, model, loss_fn)
 
 test(test_dataloader, model, loss_fn)
 print("Done!")
