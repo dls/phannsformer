@@ -30,11 +30,11 @@ def train(dataloader, model, noise_loss_fn, class_loss_fn, optimizer):
     size = len(dataloader.dataset)
     model.train()
     for batch, (X, y) in enumerate(dataloader):
-        X, y = X.to(device).int(), y.to(device).int()
+        X, y = X.to(device).long(), y.to(device).long()
 
         # Add noise
-        nPos = torch.randint(0, 10, (X.shape[0], X.shape[1]), device=device).int()
-        nV   = torch.randint(0, 24, (X.shape[0], X.shape[1]), device=device).int()
+        nPos = torch.randint(0, 10, (X.shape[0], X.shape[1]), device=device).long()
+        nV   = torch.randint(0, 24, (X.shape[0], X.shape[1]), device=device).long()
         nX   = torch.clone(X)
         #nX   = torch.where(nPos == 0, nV, nX)
         nX[nPos == 0] = nV[nPos == 0]
